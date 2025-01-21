@@ -24,8 +24,11 @@ libs = [
     "threading", "time", "copy", "librosa", "sd", "sf","requests",
     "copy","Data"
 ]
-DONE = "Done"
-
+DONE = "Done: "
+SHOW = "Show"
+HIDDEN = "Hidden"
+LOADINGVIEW = "Loading View...: "
+NOTHING = "Nothing: "
 
 class Data:
     mouse: dict = {"X": Window_main.winfo_pointerxy()[0],"Y": Window_main.winfo_pointerxy()[1]}
@@ -225,18 +228,39 @@ class Setting:
     def theme():
         Window_main.set_theme(ComboBox_setting_theme.get())
     def progressbar():
-        if ComboBox_setting_progressbar.get() == "Show":
+        if ComboBox_setting_progressbar.get() == SHOW:
             Progressbar_load.grid(row = 0, column = 2)
-        elif ComboBox_setting_progressbar.get() == "Hidden":
+        elif ComboBox_setting_progressbar.get() == HIDDEN:
             Progressbar_load.grid_forget() 
     def state():
-        if ComboBox_setting_state.get() == "Show":
+        if ComboBox_setting_state.get() == SHOW:
             Label_state.grid(row = 0, column = 3)
-        elif ComboBox_setting_state.get() == "Hidden":
-            Label_state.grid_forget() 
+        elif ComboBox_setting_state.get() == HIDDEN:
+            Label_state.grid_forget()
+    def language():
+        global DONE, SHOW, HIDDEN, LOADINGVIEW, NOTHING
+        if ComboBox_setting_language.get() == "Tiếng Việt": 
+            DONE = "Xong: "
+            SHOW = "Hiển Thị"
+            HIDDEN = "Ẩn"
+            LOADINGVIEW = "Tải biểu đồ...: "
+            NOTHING = "Không có gì: "
+
+            
 class Zoom:
     def zooms(event):
-        print(event.delta)
+        if event.delta > 0: 
+            size[0] /= zoom
+            size[1] /= zoom
+            ax.set_xlim(-size[0] + point[0], size[0] + point[0])
+            ax.set_ylim(-size[1] + point[1], size[1] + point[1])
+            display.draw()
+        else:
+            size[0] *= zoom
+            size[1] *= zoom
+            ax.set_xlim(-size[0] + point[0], size[0] + point[0])
+            ax.set_ylim(-size[1] + point[1], size[1] + point[1])
+            display.draw()
     def zoom(event = ""):
         size[0] /= zoom
         size[1] /= zoom
@@ -261,12 +285,10 @@ class Move:
                 display.get_tk_widget().winfo_pointerx(),
                 display.get_tk_widget().winfo_pointery()
             ])
-            xlim = ax.get_xlim()
-            ylim = ax.get_ylim()
-            dx = -(x - lx)
-            dy = y - ly
-            ax.set_xlim(xlim[0] + dx, xlim[1] + dx)
-            ax.set_ylim(ylim[0] + dy, ylim[1] + dy)
+            point[0] += -(x - lx)
+            point[1] += y - ly
+            ax.set_xlim(-size[0] + point[0] , size[0] + point[0])
+            ax.set_ylim(-size[1] + point[1] , size[1] + point[1])
             lx, ly = ax.transData.inverted().transform([
                 display.get_tk_widget().winfo_pointerx(),
                 display.get_tk_widget().winfo_pointery()
@@ -627,11 +649,11 @@ ComboBox_setting_state = ttk.Combobox(Labelframe_window, values = ["Show", "Hidd
 ComboBox_setting_state.current(0) 
 ComboBox_setting_state.grid(row = 2, column = 1, sticky = W)
 
-Label_setting_state = Label(Labelframe_window, text = "Language: ", font = ("Arial", 12))
-Label_setting_state.grid(row = 3, column = 0, sticky = W)
-ComboBox_setting_state = ttk.Combobox(Labelframe_window, values = ["English", "Tiếng Việt"], width = 16, state = "readonly", font = ("Arial", 12))
-ComboBox_setting_state.current(0) 
-ComboBox_setting_state.grid(row = 3, column = 1, sticky = W)
+Label_setting_language = Label(Labelframe_window, text = "Language: ", font = ("Arial", 12))
+Label_setting_language.grid(row = 3, column = 0, sticky = W)
+ComboBox_setting_language = ttk.Combobox(Labelframe_window, values = ["English", "Tiếng Việt"], width = 16, state = "readonly", font = ("Arial", 12))
+ComboBox_setting_language.current(0) 
+ComboBox_setting_language.grid(row = 3, column = 1, sticky = W)
 
 Labelframe_window.grid(row = 1, column = 0, sticky = W)
 
@@ -705,7 +727,7 @@ Tab_tools.pack(fill = Y, side = RIGHT, pady = 1)
 
 Frame_in = Frame(Window_main)
 
-ComboBox_mode = ttk.Combobox(Frame_in, values = ["y = ", "y' = ", "Find hidden"], font = ("Arial", 12, "bold"), width = 10, state = "readonly")
+ComboBox_mode = ttk.Combobox(Frame_in, values = ["y = ", "Find hidden"], font = ("Arial", 12, "bold"), width = 10, state = "readonly")
 ComboBox_mode.current(0)
 ComboBox_mode.pack(side = LEFT)
 
