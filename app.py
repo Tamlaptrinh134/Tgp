@@ -256,7 +256,7 @@ class Setting:
 
             Label_setting_width.config(text = "Chiều rộng: ")
             Label_setting_width.config(text = "Chiều cao: ")
-            Label_setting_step.config(text = "Chiều cao: ")
+            Label_setting_step.config(text = "Số : ")
             
 class Zoom:
     def zooms(event):
