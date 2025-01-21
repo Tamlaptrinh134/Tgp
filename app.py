@@ -185,6 +185,7 @@ class Setting:
         Setting.theme()
         Setting.progressbar()
         Setting.state()
+        Setting.language()
         ax.set_xlim(-(Data.width + round(Data.width / 10)), Data.width + round(Data.width / 10))
         ax.set_ylim(-(Data.height + round(Data.height / 10)), Data.height + round(Data.height / 10))
         Data.zoom = 1
@@ -246,6 +247,16 @@ class Setting:
             LOADINGVIEW = "Tải biểu đồ...: "
             NOTHING = "Không có gì: "
 
+            Labelframe_error.config(text = "Thông báo")
+            Labelframe_graph.config(text = "Biểu đồ")
+            Labelframe_window.config(text = "Cửa sổ")
+            Labelframe_plot.config(text = "Đồ thị")
+            Labelframe_variable_add.config(text = "Thêm biến")
+            Labelframe_variable_add.config(text = "Điều khiển biến")
+
+            Label_setting_width.config(text = "Chiều rộng: ")
+            Label_setting_width.config(text = "Chiều cao: ")
+            Label_setting_step.config(text = "Chiều cao: ")
             
 class Zoom:
     def zooms(event):
@@ -458,14 +469,14 @@ class Calculator:
                     Listbox_error.insert(END, line)
                     Listbox_error.itemconfigure(index, fg="#f55545")
                 Data.loop = 0
-        Label_title_state.config(text = "Loading View...: ")
+        Label_title_state.config(text = LOADINGVIEW)
         main()
         while loop:
             main()
             time.sleep(1 / Data.hz)
         var_progressbar_load.set(0)
         Progressbar_load.update()
-        Label_title_state.config(text = "Done: ")
+        Label_title_state.config(text = DONE)
         Label_state.config(text = "")
     def cal2(self, event = ""):
         global loop
@@ -504,14 +515,14 @@ class Calculator:
                     Listbox_error.insert(END, line)
                     Listbox_error.itemconfigure(index, fg="#f55545")
                 Data.loop = 0
-        Label_title_state.config(text = "Loading View...: ")
+        Label_title_state.config(text = LOADINGVIEW)
         main()
         while loop:
             main()
             time.sleep(1 / Data.hz)
         var_progressbar_load.set(0)
         Progressbar_load.update()
-        Label_title_state.config(text = "Done: ")
+        Label_title_state.config(text = DONE)
         Label_state.config(text = "")
     def loop_start(self):
         global loop
@@ -639,13 +650,13 @@ ComboBox_setting_theme.grid(row = 0, column = 1, sticky = W)
 
 Label_setting_progressbar = Label(Labelframe_window, text = "Progressbar: ", font = ("Arial", 12))
 Label_setting_progressbar.grid(row = 1, column = 0, sticky = W)
-ComboBox_setting_progressbar = ttk.Combobox(Labelframe_window, values = ["Show", "Hidden"], width = 16, state = "readonly", font = ("Arial", 12))
+ComboBox_setting_progressbar = ttk.Combobox(Labelframe_window, values = [SHOW, HIDDEN], width = 16, state = "readonly", font = ("Arial", 12))
 ComboBox_setting_progressbar.current(0) 
 ComboBox_setting_progressbar.grid(row = 1, column = 1, sticky = W)
 
 Label_setting_state = Label(Labelframe_window, text = "State (%): ", font = ("Arial", 12))
 Label_setting_state.grid(row = 2, column = 0, sticky = W)
-ComboBox_setting_state = ttk.Combobox(Labelframe_window, values = ["Show", "Hidden"], width = 16, state = "readonly", font = ("Arial", 12))
+ComboBox_setting_state = ttk.Combobox(Labelframe_window, values = [SHOW, HIDDEN], width = 16, state = "readonly", font = ("Arial", 12))
 ComboBox_setting_state.current(0) 
 ComboBox_setting_state.grid(row = 2, column = 1, sticky = W)
 
