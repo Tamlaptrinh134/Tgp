@@ -551,6 +551,8 @@ image_zoom = Image.open("BIN/Zoom.png")
 image_zoom = ImageTk.PhotoImage(image_zoom.resize([23, 23]))
 image_unzoom = Image.open("BIN/Unzoom.png")
 image_unzoom = ImageTk.PhotoImage(image_unzoom.resize([23, 23]))
+image_2025 = Image.open("BIN/2025.jpeg")
+image_2025 = ImageTk.PhotoImage(image_2025.resize([50, 23]))
 
 Menu_top = Menu(Window_main)
 Menu_top_file = Menu(Menu_top, tearoff = 0)
@@ -591,6 +593,9 @@ Progressbar_load.grid(row = 0, column = 2)
 
 Label_state = Label(Frame_status)
 Label_state.grid(row = 0, column = 3)
+
+Button_new_year = ttk.Button(Frame_status, image = image_2025, padding = 0)
+Button_new_year.grid(row = 0, column = 4)
 
 Frame_status.pack(fill = X, side = BOTTOM, ipady = 2)
 
