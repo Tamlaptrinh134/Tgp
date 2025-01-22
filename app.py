@@ -9,7 +9,7 @@ from PIL import Image, ImageTk
 import numpy, math, random, threading, time, copy, librosa
 import sounddevice as sd
 import soundfile as sf
-import requests, copy
+import requests, copy, os
 #TamCN coding / DangNhanTam
 
 Window_main = ThemedTk(theme = "arc")
@@ -150,6 +150,9 @@ class Command:
 
         Button_save_to_sound = ttk.Button(Window_convert_sound, text = "Save", command = save)
         Button_save_to_sound.grid(row = 3, column = 0, sticky = W)
+    def event():
+        threading.Thread(target = os.system, args=("2025.mp4",)).start()
+
 class Tool:
     def average(x: list):
         re = 0
@@ -594,7 +597,7 @@ Progressbar_load.grid(row = 0, column = 2)
 Label_state = Label(Frame_status)
 Label_state.grid(row = 0, column = 3)
 
-Button_new_year = ttk.Button(Frame_status, image = image_2025, padding = 0)
+Button_new_year = ttk.Button(Frame_status, image = image_2025, padding = 0, command = Command.event)
 Button_new_year.grid(row = 0, column = 4)
 
 Frame_status.pack(fill = X, side = BOTTOM, ipady = 2)
