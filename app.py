@@ -268,7 +268,17 @@ class Setting:
             Label_setting_language.config(text = "Ngôn ngữ")
             Label_variable_name.config(text = "Tên: ")
             Label_variable_value.config(text = "Giá trị: ")
+            
+            Button_save.config(text = "Lưu")
+            Button_variable_add.config(text = "Thêm")
+            
+            ComboBox_setting_progressbar.config(values = [SHOW, HIDDEN])
+            ComboBox_setting_state.config(values = [SHOW, HIDDEN])
+            ComboBox_mode.config(values = ["y = ", FINDHIDDEN])
 
+            Tab_tools.configure(0, "Bảng điều khiển")
+            Tab_tools.configure(1, "Cài đặt")
+            Tab_tools.configure(2, "Biến")
 
 class Zoom:
     def zooms(event):
