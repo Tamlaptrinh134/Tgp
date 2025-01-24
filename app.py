@@ -259,7 +259,14 @@ class Setting:
 
             Label_setting_width.config(text = "Chiều rộng: ")
             Label_setting_width.config(text = "Chiều cao: ")
-            Label_setting_step.config(text = "Số : ")
+            Label_setting_step.config(text = "Số bước: ")
+            Label_setting_theme.config(text = "Chủ đề: ")
+            Label_setting_progressbar.config(text = "Thanh tiến trình: ")
+            Label_setting_state.config(text = "Trạng thái: ")
+            Label_setting_language.config(text = "Ngôn ngữ")
+            Label_variable_name.config(text = "Tên: ")
+            Label_variable_value.config(text = "Giá trị: ")
+
             
 class Zoom:
     def zooms(event):
