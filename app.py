@@ -9,7 +9,7 @@ from PIL import Image, ImageTk
 import numpy, math, random, threading, time, copy, librosa
 import sounddevice as sd
 import soundfile as sf
-import requests, copy, os
+import requests, copy, os, json
 #TamCN coding / DangNhanTam
 
 Window_main = ThemedTk(theme = "arc")
@@ -18,6 +18,7 @@ Window_main.geometry("1270x700")
 
 #variable:
 list_theme = Window_main.themes
+languages = json.load(open("BIN/languages.json", "r", encoding = "utf-8"))
 variables = []
 libs = [
     "fdl", "msb", "Image", "ImageTk", "numpy", "math", "random",
@@ -243,42 +244,53 @@ class Setting:
         elif ComboBox_setting_state.get() == HIDDEN:
             Label_state.grid_forget()
     def language():
-        global DONE, SHOW, HIDDEN, LOADINGVIEW, NOTHING
-        if ComboBox_setting_language.get() == "Tiếng Việt": 
-            DONE = "Xong: "
-            SHOW = "Hiển Thị"
-            HIDDEN = "Ẩn"
-            LOADINGVIEW = "Tải biểu đồ...: "
-            NOTHING = "Không có gì: "
-            FINDHIDDEN = "Tìm ẩn"
+        global DONE, SHOW, HIDDEN, LOADINGVIEW, NOTHING, FINDHIDDEN
+        language = languages[ComboBox_setting_language.get()]
+        DONE = language["DONE"]
+        SHOW = language["SHOW"]
+        HIDDEN = language["HIDDEN"]
+        LOADINGVIEW = language["LOADINGVIEW"]
+        NOTHING = language["NOTHING"]
+        FINDHIDDEN = language["FINDHIDDEN"]
 
-            Labelframe_error.config(text = "Thông báo")
-            Labelframe_graph.config(text = "Biểu đồ")
-            Labelframe_window.config(text = "Cửa sổ")
-            Labelframe_plot.config(text = "Đồ thị")
-            Labelframe_variable_add.config(text = "Thêm biến")
-            Labelframe_variable_add.config(text = "Điều khiển biến")
+        Labelframe_error.config(text = language["Labelframe_error"])
+        Labelframe_graph.config(text = language["Labelframe_graph"])
+        Labelframe_window.config(text = language["Labelframe_window"])
+        Labelframe_plot.config(text = language["Labelframe_plot"])
+        Labelframe_variable_add.config(text = language["Labelframe_variable_add"])
+        Labelframe_variable_control.config(text = language["Labelframe_variable_control"])
 
-            Label_setting_width.config(text = "Chiều rộng: ")
-            Label_setting_width.config(text = "Chiều cao: ")
-            Label_setting_step.config(text = "Số bước: ")
-            Label_setting_theme.config(text = "Chủ đề: ")
-            Label_setting_progressbar.config(text = "Thanh tiến trình: ")
-            Label_setting_state.config(text = "Trạng thái: ")
-            Label_setting_language.config(text = "Ngôn ngữ")
-            Label_variable_name.config(text = "Tên: ")
-            Label_variable_value.config(text = "Giá trị: ")
-            
-            Button_save.config(text = "Lưu")
-            Button_variable_add.config(text = "Thêm")
-            
-            ComboBox_setting_progressbar.config(values = [SHOW, HIDDEN])
-            ComboBox_setting_state.config(values = [SHOW, HIDDEN])
-            ComboBox_mode.config(values = ["y = ", FINDHIDDEN])
+        Label_setting_width.config(text = language["Label_setting_width"])
+        Label_setting_height.config(text = language["Label_setting_height"])
+        Label_setting_step.config(text = language["Label_setting_step"])
+        Label_setting_theme.config(text = language["Label_setting_theme"])
+        Label_setting_progressbar.config(text = language["Label_setting_progressbar"])
+        Label_setting_state.config(text = language["Label_setting_state"])
+        Label_setting_language.config(text = language["Label_setting_language"])
+        Label_variable_name.config(text = language["Label_variable_name"])
+        Label_variable_value.config(text = language["Label_variable_value"])
 
-            Tab_tools.configure(0, "Bảng điều khiển")
-            Tab_tools.configure(1, "Cài đặt")
-            Tab_tools.configure(2, "Biến")
+        Button_save.config(text = language["Button_save"])
+        Button_variable_add.config(text = language["Button_variable_add"])
+
+        ComboBox_setting_progressbar.config(values = language["ComboBox_setting_progressbar"])
+        ComboBox_setting_state.config(values = language["ComboBox_setting_state"])
+        ComboBox_mode.config(values = language["ComboBox_mode"])
+
+        Tab_tools.tab(0, text = language["Tab_tools"][0])
+        Tab_tools.tab(1, text = language["Tab_tools"][1])
+        Tab_tools.tab(2, text = language["Tab_tools"][2])
+
+        Menu_top.entryconfig(1, label = language["Menu_top"]["1"])
+        Menu_top_file.entryconfig(0, label = language["Menu_top"]["Menu_top_file"]["0"])
+        Menu_top_file.entryconfig(2, label = language["Menu_top"]["Menu_top_file"]["2"])
+        Menu_top_file.entryconfig(3, label = language["Menu_top"]["Menu_top_file"]["3"])
+        Menu_top_file.entryconfig(5, label = language["Menu_top"]["Menu_top_file"]["5"])
+        Menu_top_file.entryconfig(6, label = language["Menu_top"]["Menu_top_file"]["6"])
+        Menu_top_file.entryconfig(7, label = language["Menu_top"]["Menu_top_file"]["7"])
+        Menu_top.entryconfig(2, label = language["Menu_top"]["2"])
+        Menu_top_tool.entryconfig(0, label = language["Menu_top"]["Menu_top_tool"]["0"])
+        Menu_top.entryconfig(3, label = language["Menu_top"]["3"])
 
 class Zoom:
     def zooms(event):
@@ -693,7 +705,7 @@ ComboBox_setting_state.grid(row = 2, column = 1, sticky = W)
 
 Label_setting_language = Label(Labelframe_window, text = "Language: ", font = ("Arial", 12))
 Label_setting_language.grid(row = 3, column = 0, sticky = W)
-ComboBox_setting_language = ttk.Combobox(Labelframe_window, values = ["English", "Tiếng Việt"], width = 16, state = "readonly", font = ("Arial", 12))
+ComboBox_setting_language = ttk.Combobox(Labelframe_window, values = list(languages.keys()), width = 16, state = "readonly", font = ("Arial", 12))
 ComboBox_setting_language.current(0) 
 ComboBox_setting_language.grid(row = 3, column = 1, sticky = W)
 
