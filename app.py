@@ -274,7 +274,9 @@ class Setting:
         Button_variable_add.config(text = language["Button_variable_add"])
 
         ComboBox_setting_progressbar.config(values = language["ComboBox_setting_progressbar"])
+        ComboBox_setting_progressbar.current(0)
         ComboBox_setting_state.config(values = language["ComboBox_setting_state"])
+        ComboBox_setting_state.current(0)
         ComboBox_mode.config(values = language["ComboBox_mode"])
 
         Tab_tools.tab(0, text = language["Tab_tools"][0])
