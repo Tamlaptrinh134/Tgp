@@ -43,7 +43,7 @@ class Data:
     height: float = 100
     loop: int = 0
     step: float = 1000
-    hz: float = 60
+    hz: float = 120
     def update(self):
         self.mouse: dict = {"X": Window_main.winfo_pointerxy()[0],"Y": Window_main.winfo_pointerxy()[1]}
 
