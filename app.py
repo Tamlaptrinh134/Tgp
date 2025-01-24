@@ -29,6 +29,7 @@ SHOW = "Show"
 HIDDEN = "Hidden"
 LOADINGVIEW = "Loading View...: "
 NOTHING = "Nothing: "
+FINDHIDDEN = "Find hidden"
 
 class Data:
     mouse: dict = {"X": Window_main.winfo_pointerxy()[0],"Y": Window_main.winfo_pointerxy()[1]}
@@ -249,6 +250,7 @@ class Setting:
             HIDDEN = "Ẩn"
             LOADINGVIEW = "Tải biểu đồ...: "
             NOTHING = "Không có gì: "
+            FINDHIDDEN = "Tìm ẩn"
 
             Labelframe_error.config(text = "Thông báo")
             Labelframe_graph.config(text = "Biểu đồ")
@@ -267,7 +269,7 @@ class Setting:
             Label_variable_name.config(text = "Tên: ")
             Label_variable_value.config(text = "Giá trị: ")
 
-            
+
 class Zoom:
     def zooms(event):
         if event.delta > 0: 
@@ -447,7 +449,7 @@ class Calculator:
     def run(self, mode):
         if mode == "y = ":
             return self.cal1()
-        elif mode == "Find hidden":
+        elif mode == FINDHIDDEN:
             return self.cal2()
     def cal1(self, event = ""):
         global loop
@@ -465,7 +467,11 @@ class Calculator:
             Progressbar_load.step(round(1 / len_x * 100, 10))
             Progressbar_load.update()
             Label_state.config(text = f"{round(Data.loop/ len_x * 100, 10)}%")
-            return eval(Variable.replace_var(Entry_command.get()))
+            try:
+                result = eval(Variable.replace_var(Entry_command.get()))
+                return result
+            except ZeroDivisionError:
+                return None
         def main():
             global Y_LINE
             try:
@@ -753,7 +759,7 @@ Tab_tools.pack(fill = Y, side = RIGHT, pady = 1)
 
 Frame_in = Frame(Window_main)
 
-ComboBox_mode = ttk.Combobox(Frame_in, values = ["y = ", "Find hidden"], font = ("Arial", 12, "bold"), width = 10, state = "readonly")
+ComboBox_mode = ttk.Combobox(Frame_in, values = ["y = ", FINDHIDDEN], font = ("Arial", 12, "bold"), width = 10, state = "readonly")
 ComboBox_mode.current(0)
 ComboBox_mode.pack(side = LEFT)
 
