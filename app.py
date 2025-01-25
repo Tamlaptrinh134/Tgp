@@ -300,7 +300,7 @@ class Setting:
         Labelframe_error.config(text = language["Labelframe_error"])
         Labelframe_graph.config(text = language["Labelframe_graph"])
         Labelframe_window.config(text = language["Labelframe_window"])
-        Labelframe_plot_elements.config(text = language["Labelframe_plot_elements"])
+        #Labelframe_plot_elements.config(text = language["Labelframe_plot_elements"])
         Labelframe_variable_add.config(text = language["Labelframe_variable_add"])
         Labelframe_variable_control.config(text = language["Labelframe_variable_control"])
 
