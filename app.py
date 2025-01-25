@@ -89,29 +89,32 @@ class Command:
                         ComboBox_mode.current(0)
                     elif call == "findhidden":
                         ComboBox_mode.current(1)
+                    calculator.run(ComboBox_mode.get(), view = False)
+                    Label_title_state.config(text = "Done")
+                    Label_state.config(text = "")
+                    var_progressbar_load.set(0)
+                    Progressbar_load.update()
                 elif mode == "database":
                     try:
                         Y_LINE = eval(value)
+                        line_main.set_ydata(Y_LINE)  
+                        display.draw()
                     except Exception as e:
                         Label_title_state.config(text = "Error")
                         Label_state.config(text = "")
                         var_progressbar_load.set(0)
                         Progressbar_load.update()
-                        msb.showerror(f"Error at read file: \n{e}\nData in this file has error")
+                        msb.showerror(title= f"Error at read file:", message = f"{e}\nData in this file has error")
                         return None
             Progressbar_load.step(100 / ldataline)
             Progressbar_load.update()
-            Label_state.config(text = f"{index / ldataline * 100}%")
-        calculator.run(ComboBox_mode.get())
-        Label_title_state.config(text = "Done")
-        Label_state.config(text = "")
-        var_progressbar_load.set(0)
-        Progressbar_load.update()
+            Label_state.config(text = f"{(index+1)/ ldataline * 100}%")
     def new_tgp():
         def add_commands(commands: list):
             nonlocal datafile
-            for command, value in commands:
+            for command, value in commands[0:-1]:
                 datafile += command+ "# " + value + ";\n"
+            datafile += commands[-1][0] + "# " + commands[-1][1]
         def save():
             ax.set_title(f"Normal mode (name: {Entry_input_name_new_file.get()})")
             mode = ComboBox_mode_new_file.get()
@@ -128,7 +131,7 @@ class Command:
                 add_commands(
                     [
                         ["mode", mode],
-                        ["data", str(Y_LINE)]
+                        ["data", str(list(Y_LINE))]
                     ]
                 )
             with open(f"BIN/{Entry_input_name_new_file.get()}.tgp", "w", encoding = "utf-8") as f:
@@ -507,11 +510,17 @@ def tips(event):
                 Menu_light.add_command(label = item, command = lambda i = item:Entry_command.insert(Entry_command.index("insert"), f".{i}"))
             post_menu()
 class Calculator:
-    def run(self, mode):
+    def run(self, mode, view = True):
         if mode == "y = ":
-            return self.cal1()
+            if view:
+                return self.cal1()
+            else:
+                return self.cal1nv()
         elif mode == FINDHIDDEN:
-            return self.cal2()
+            if view:
+                return self.cal2()
+            else:
+                return self.cal2nv()
     def cal1(self, event = ""):
         global loop
         global X_LINE
@@ -555,6 +564,41 @@ class Calculator:
         Progressbar_load.update()
         Label_title_state.config(text = DONE)
         Label_state.config(text = "")
+    def cal1nv(self, event = ""):
+        global loop
+        global X_LINE
+        global Y_LINE
+        X_LINE = numpy.linspace(-Data.width, Data.width, Data.step)
+        Y_LINE = numpy.linspace(-Data.height, Data.height, Data.step)
+        Listbox_error.delete(0, END)
+        len_x = len(list(X_LINE))
+        Button_stop.config(state = NORMAL)
+        def core(x):
+            Data.update(Data)
+            Variable.set_var("$x", str(round(x, 10)))
+            Data.loop += 1
+            try:
+                result = eval(Variable.replace_var(Entry_command.get()))
+                return result
+            except ZeroDivisionError:
+                return None
+        def main():
+            global Y_LINE
+            try:
+                Y_LINE = numpy.array(list(map(core, list(X_LINE))))
+                Data.loop = 0
+                line_main.set_ydata(Y_LINE)  
+                display.draw()
+            except Exception as e:
+                self.loop_stop()
+                for index, line in enumerate(str(e).split("\n")):
+                    Listbox_error.insert(END, line)
+                    Listbox_error.itemconfigure(index, fg="#f55545")
+                Data.loop = 0
+        main()
+        while loop:
+            main()
+            time.sleep(1 / Data.hz)
     def cal2(self, event = ""):
         global loop
         global X_LINE, Y_LINE
@@ -601,6 +645,43 @@ class Calculator:
         Progressbar_load.update()
         Label_title_state.config(text = DONE)
         Label_state.config(text = "")
+    def cal2(self, event = ""):
+        global loop
+        global X_LINE, Y_LINE
+        global X_DOT, Y_DOT
+        X_DOT = []
+        Y_DOT = []
+        Listbox_error.delete(0, END)
+        len_x = len(list(X_LINE))
+        Button_stop.config(state = NORMAL)
+        dot_main_state = True
+        dot_main.set_visible(dot_main_state)
+        def main():
+            global Y_LINE
+            try:
+                for x in SEPARATOR_AX["X"]:
+                    Variable.set_var("$x", str(round(x, 10)))
+                    for y in SEPARATOR_AX["Y"]:
+                        Variable.set_var("$y", str(round(y, 10)))
+                        Data.update(Data)
+                        print(eval(Variable.replace_var(Entry_command.get())))
+                        if eval(Variable.replace_var(Entry_command.get())):
+                            Y_DOT.append(y)
+                            X_DOT.append(x)
+                    Data.loop += 1
+                Data.loop = 0
+                dot_main.set_offsets(numpy.c_[X_DOT, Y_DOT]) 
+                display.draw()
+            except Exception as e:
+                self.loop_stop()
+                for index, line in enumerate(str(e).split("\n")):
+                    Listbox_error.insert(END, line)
+                    Listbox_error.itemconfigure(index, fg="#f55545")
+                Data.loop = 0
+        main()
+        while loop:
+            main()
+            time.sleep(1 / Data.hz)
     def loop_start(self):
         global loop
         loop = True

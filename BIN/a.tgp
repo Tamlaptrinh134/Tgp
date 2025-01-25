@@ -1,0 +1,7 @@
+mode# normal;
+call# y=;
+variable# [['$x', -100.0], ['$y', -100.0]];
+data# mode# normal;
+call# y=;
+variable# [['$x', -100.0], ['$y', -100.0]];
+data# $x**2
