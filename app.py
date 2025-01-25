@@ -231,6 +231,10 @@ class Setting:
         Setting.progressbar()
         Setting.state()
         Setting.language()
+        Setting.line_sprt_x()
+        Setting.line_sprt_y()
+        Setting.line_main()
+        Setting.dot_main()
         ax.set_xlim(-(Data.width + round(Data.width / 10)), Data.width + round(Data.width / 10))
         ax.set_ylim(-(Data.height + round(Data.height / 10)), Data.height + round(Data.height / 10))
         Data.zoom = 1
@@ -296,7 +300,7 @@ class Setting:
         Labelframe_error.config(text = language["Labelframe_error"])
         Labelframe_graph.config(text = language["Labelframe_graph"])
         Labelframe_window.config(text = language["Labelframe_window"])
-        Labelframe_plot.config(text = language["Labelframe_plot"])
+        Labelframe_plot_elements.config(text = language["Labelframe_plot_elements"])
         Labelframe_variable_add.config(text = language["Labelframe_variable_add"])
         Labelframe_variable_control.config(text = language["Labelframe_variable_control"])
 
@@ -333,7 +337,28 @@ class Setting:
         Menu_top.entryconfig(2, label = language["Menu_top"]["2"])
         Menu_top_tool.entryconfig(0, label = language["Menu_top"]["Menu_top_tool"]["0"])
         Menu_top.entryconfig(3, label = language["Menu_top"]["3"])
+
         languagel = languages[ComboBox_setting_language.get()]
+    def line_sprt_x():
+        if ComboBox_setting_line_sprt_x.get() == SHOW:
+            line_sprt_x.set_visible(True)
+        elif ComboBox_setting_line_sprt_x.get() == HIDDEN:
+            line_sprt_x.set_visible(False)
+    def line_sprt_y():
+        if ComboBox_setting_line_sprt_y.get() == SHOW:
+            line_sprt_y.set_visible(True)
+        elif ComboBox_setting_line_sprt_y.get() == HIDDEN:
+            line_sprt_y.set_visible(False)
+    def line_main():
+        if ComboBox_setting_line_main.get() == SHOW:
+            line_main.set_visible(True)
+        elif ComboBox_setting_line_main.get() == HIDDEN:
+            line_main.set_visible(False)
+    def dot_main():
+        if ComboBox_setting_dot_main.get() == SHOW:
+            dot_main.set_visible(True)
+        elif ComboBox_setting_dot_main.get() == HIDDEN:
+            dot_main.set_visible(False)
 class Zoom:
     def zooms(event):
         if event.delta > 0: 
@@ -836,14 +861,36 @@ ComboBox_setting_language.grid(row = 3, column = 1, sticky = W)
 
 Labelframe_window.grid(row = 1, column = 0, sticky = W)
 
-Labelframe_plot = ttk.Labelframe(Frame_setting, text = "Plot")
+Labelframe_plot_elements = ttk.Labelframe(Frame_setting, text = "Plot elements")
 
+Label_setting_line_sprt_x = Label(Labelframe_plot_elements, text = "line_sprt_x: ", font = ("Arial", 12))
+Label_setting_line_sprt_x.grid(row = 0, column = 0, sticky = W)
+ComboBox_setting_line_sprt_x = ttk.Combobox(Labelframe_plot_elements, values = [SHOW, HIDDEN], width = 16, state = "readonly", font = ("Arial", 12))
+ComboBox_setting_line_sprt_x.current(0) 
+ComboBox_setting_line_sprt_x.grid(row = 0, column = 1, sticky = W)
 
+Label_setting_line_sprt_y = Label(Labelframe_plot_elements, text = "line_sprt_y: ", font = ("Arial", 12))
+Label_setting_line_sprt_y.grid(row = 1, column = 0, sticky = W)
+ComboBox_setting_line_sprt_y = ttk.Combobox(Labelframe_plot_elements, values = [SHOW, HIDDEN], width = 16, state = "readonly", font = ("Arial", 12))
+ComboBox_setting_line_sprt_y.current(0) 
+ComboBox_setting_line_sprt_y.grid(row = 1, column = 1, sticky = W)
 
-Labelframe_plot.grid(row = 2, column = 0, sticky = W)
+Label_setting_line_main = Label(Labelframe_plot_elements, text = "line_main: ", font = ("Arial", 12))
+Label_setting_line_main.grid(row = 2, column = 0, sticky = W)
+ComboBox_setting_line_main = ttk.Combobox(Labelframe_plot_elements, values = [SHOW, HIDDEN], width = 16, state = "readonly", font = ("Arial", 12))
+ComboBox_setting_line_main.current(0) 
+ComboBox_setting_line_main.grid(row = 2, column = 1, sticky = W)
+
+Label_setting_dot_main = Label(Labelframe_plot_elements, text = "dot_main: ", font = ("Arial", 12))
+Label_setting_dot_main.grid(row = 3, column = 0, sticky = W)
+ComboBox_setting_dot_main = ttk.Combobox(Labelframe_plot_elements, values = [SHOW, HIDDEN], width = 16, state = "readonly", font = ("Arial", 12))
+ComboBox_setting_dot_main.current(1) 
+ComboBox_setting_dot_main.grid(row = 3, column = 1, sticky = W)
+
+Labelframe_plot_elements.grid(row = 2, column = 0, sticky = W)
 
 Button_save = ttk.Button(Frame_setting, text = "Save", command = Setting.update)
-Button_save.grid(row = 2, column = 0, sticky = E)
+Button_save.grid(row = 3, column = 0, sticky = E)
 
 Tab_tools.add(Frame_setting, text = "Setting")
 
