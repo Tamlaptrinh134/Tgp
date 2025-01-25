@@ -229,7 +229,7 @@ class Setting:
             for line in str(e).split("\n"):
                 Listbox_error.insert(END, line)
     def hz():
-        #Data.hz = float(Spinbox_setting_width.get())
+        Data.hz = float(Spinbox_setting_hz.get())
         pass
     def theme():
         Window_main.set_theme(ComboBox_setting_theme.get())
@@ -682,6 +682,11 @@ Label_setting_step = Label(Labelframe_graph, text = "Step: ", font = ("Arial", 1
 Label_setting_step.grid(row = 2, column = 0, sticky = W)
 Spinbox_setting_step = ttk.Spinbox(Labelframe_graph, from_ = -2147483647, to = 2147483647, font = ("Arial", 12))
 Spinbox_setting_step.grid(row = 2, column = 1, sticky = W)
+
+Label_setting_hz = Label(Labelframe_graph, text = "Hz: ", font = ("Arial", 12))
+Label_setting_hz.grid(row = 3, column = 0, sticky = W)
+Spinbox_setting_hz = ttk.Spinbox(Labelframe_graph, from_ = 30, to = 360, font = ("Arial", 12))
+Spinbox_setting_hz.grid(row = 3, column = 1, sticky = W)
 
 Labelframe_graph.grid(row = 0, column = 0, sticky = W)
 
