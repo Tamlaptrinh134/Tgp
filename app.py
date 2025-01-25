@@ -31,6 +31,7 @@ HIDDEN = "Hidden"
 LOADINGVIEW = "Loading View...: "
 NOTHING = "Nothing: "
 FINDHIDDEN = "Find hidden"
+languagel = languages["English"]
 
 class Data:
     mouse: dict = {"X": Window_main.winfo_pointerxy()[0],"Y": Window_main.winfo_pointerxy()[1]}
@@ -244,7 +245,7 @@ class Setting:
         elif ComboBox_setting_state.get() == HIDDEN:
             Label_state.grid_forget()
     def language():
-        global DONE, SHOW, HIDDEN, LOADINGVIEW, NOTHING, FINDHIDDEN
+        global DONE, SHOW, HIDDEN, LOADINGVIEW, NOTHING, FINDHIDDEN, languagel
         language = languages[ComboBox_setting_language.get()]
         DONE = language["DONE"]
         SHOW = language["SHOW"]
@@ -274,12 +275,9 @@ class Setting:
         Button_variable_add.config(text = language["Button_variable_add"])
 
         ComboBox_setting_progressbar.config(values = language["ComboBox_setting_progressbar"])
-        if ComboBox_setting_progressbar.current() >= 0:
-            ComboBox_setting_progressbar.current(ComboBox_setting_progressbar.current())
+        ComboBox_setting_progressbar.current(languagel["ComboBox_setting_progressbar"].index(ComboBox_setting_progressbar.get()))
         ComboBox_setting_state.config(values = language["ComboBox_setting_state"])
-        if ComboBox_setting_state.current() >= 0:
-            ComboBox_setting_state.current(ComboBox_setting_state.current())
-        ComboBox_mode.config(values = language["ComboBox_mode"])
+        ComboBox_setting_state.current(languagel["ComboBox_setting_state"].index(ComboBox_setting_state.get()))
         ComboBox_mode.config(values = language["ComboBox_mode"])
 
         Tab_tools.tab(0, text = language["Tab_tools"][0])
@@ -296,7 +294,7 @@ class Setting:
         Menu_top.entryconfig(2, label = language["Menu_top"]["2"])
         Menu_top_tool.entryconfig(0, label = language["Menu_top"]["Menu_top_tool"]["0"])
         Menu_top.entryconfig(3, label = language["Menu_top"]["3"])
-
+        languagel = languages[ComboBox_setting_language.get()]
 class Zoom:
     def zooms(event):
         if event.delta > 0: 
