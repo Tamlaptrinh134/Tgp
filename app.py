@@ -670,7 +670,7 @@ class Calculator:
         Progressbar_load.update()
         Label_title_state.config(text = DONE)
         Label_state.config(text = "")
-    def cal2(self, event = ""):
+    def cal2nv(self, event = ""):
         global loop
         global X_LINE, Y_LINE
         global X_DOT, Y_DOT
