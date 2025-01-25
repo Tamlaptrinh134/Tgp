@@ -58,12 +58,15 @@ class Command:
         dataline = data.split(";")
         ldataline = len(dataline)
         mode = ""
+        call = ""
         Label_title_state.config(text = "Load file")
         for index,item in enumerate(dataline):
             command = item.split("# ")[0]
             value = item.split("# ")[1]
             if command == "mode":
                 mode = value
+            elif command == "call":
+                call = value
             elif command == "variable":
                 variables = [variables[0]]
                 try:
@@ -82,7 +85,11 @@ class Command:
                 if mode == "normal":
                     Entry_command.delete(0, END)
                     Entry_command.insert(0, value)
-                elif mode == "invide":
+                    if call == "y=":
+                        ComboBox_mode.current(0)
+                    elif call == "findhidden":
+                        ComboBox_mode.current(1)
+                elif mode == "database":
                     try:
                         Y_LINE = eval(value)
                     except Exception as e:
@@ -101,8 +108,32 @@ class Command:
         var_progressbar_load.set(0)
         Progressbar_load.update()
     def new_tgp():
-        def ok():
+        def add_commands(commands: list):
+            nonlocal datafile
+            for command, value in commands:
+                datafile += command+ "# " + value + ";\n"
+        def save():
             ax.set_title(f"Normal mode (name: {Entry_input_name_new_file.get()})")
+            mode = ComboBox_mode_new_file.get()
+            if mode == "normal":
+                add_commands(
+                    [
+                        ["mode", mode],
+                        ["call", "y=" if ComboBox_mode.get() == "y = " else "findhidden"],
+                        ["variable", str(variables)],
+                        ["data", Entry_command.get()]
+                    ]
+                )
+            elif mode == "database":
+                add_commands(
+                    [
+                        ["mode", mode],
+                        ["data", str(Y_LINE)]
+                    ]
+                )
+            with open(f"BIN/{Entry_input_name_new_file.get()}.tgp", "w", encoding = "utf-8") as f:
+                f.write(datafile)
+        datafile = ""
         Window_new_file = Toplevel(Window_main)
         Window_new_file.geometry("600x400")
 
@@ -111,7 +142,12 @@ class Command:
         Entry_input_name_new_file = ttk.Entry(Window_new_file, width = 20, font = ("Arial", 12))
         Entry_input_name_new_file.grid(row = 1, column = 1, sticky = W)
 
-        Button_ok_new_file = ttk.Button(Window_new_file, text = "Ok", command = ok)
+        Label_input_name_new_file= Label(Window_new_file, text = "Mode: ", font = ("Arial", 12))
+        Label_input_name_new_file.grid(row = 2, column = 0, sticky = W)
+        ComboBox_mode_new_file = ttk.Combobox(Window_new_file, width = 20, values = ["normal", "database"],  font = ("Arial", 12))
+        ComboBox_mode_new_file.grid(row = 2, column = 1, sticky = W)
+
+        Button_ok_new_file = ttk.Button(Window_new_file, text = "Ok", command = save)
         Button_ok_new_file.grid(row = 3, column = 0, sticky = W)
     def convert_to_sound():
         def path_chosse():
