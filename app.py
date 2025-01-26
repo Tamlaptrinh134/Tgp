@@ -96,8 +96,12 @@ class Command:
                     Progressbar_load.update()
                 elif mode == "database":
                     try:
-                        Y_LINE = eval(value)
-                        line_main.set_ydata(Y_LINE)  
+                        if call == "plot_main":
+                            Y_LINE = eval(value)
+                            line_main.set_ydata(Y_LINE)
+                        elif call == "dot_main":
+                            X_DOT, Y_DOT = eval(value)
+                            dot_main.set_offsets(numpy.c_[X_DOT, Y_DOT])
                         display.draw()
                     except Exception as e:
                         Label_title_state.config(text = "Error")
@@ -110,6 +114,9 @@ class Command:
             Progressbar_load.update()
             Label_state.config(text = f"{(index+1)/ ldataline * 100}%")
     def new_tgp():
+        def path_chosse():
+            Entry_input_path_new_file.delete(0, END)
+            Entry_input_path_new_file.insert(0, fdl.askdirectory())
         def add_commands(commands: list):
             nonlocal datafile
             for command, value in commands[0:-1]:
@@ -117,7 +124,10 @@ class Command:
             datafile += commands[-1][0] + "# " + commands[-1][1]
         def save():
             ax.set_title(f"Normal mode (name: {Entry_input_name_new_file.get()})")
+            path = Entry_input_path_new_file.get()
+            name = Entry_input_name_new_file.get()
             mode = ComboBox_mode_new_file.get()
+            call = ComboBox_call_new_file.get()
             if mode == "normal":
                 add_commands(
                     [
@@ -131,27 +141,41 @@ class Command:
                 add_commands(
                     [
                         ["mode", mode],
-                        ["data", str(list(Y_LINE))]
+                        ["call", call]
+                        ["data", str(list(Y_LINE)) if call == "plot_line" else str([list(X_DOT), list(Y_DOT)])]
                     ]
                 )
-            with open(f"BIN/{Entry_input_name_new_file.get()}.tgp", "w", encoding = "utf-8") as f:
+            with open(f"{os.path.join(path, name)}.tgp", "w", encoding = "utf-8") as f:
                 f.write(datafile)
+            Window_new_file.destroy()
         datafile = ""
         Window_new_file = Toplevel(Window_main)
         Window_new_file.geometry("600x400")
 
-        Label_input_name_new_file= Label(Window_new_file, text = "Name: ", font = ("Arial", 12))
+        Label_input_path_new_file = Label(Window_new_file, text = "Path: ", font = ("Arial", 12))
+        Label_input_path_new_file.grid(row = 0, column = 0, sticky = W)
+        Entry_input_path_new_file = ttk.Entry(Window_new_file, width = 20, font = ("Arial", 12))
+        Entry_input_path_new_file.grid(row = 0, column = 1, sticky = W)
+        Button_input_path_new_file = ttk.Button(Window_new_file, text = "Path", command = path_chosse)
+        Button_input_path_new_file.grid(row = 0, column = 2, sticky = W)
+
+        Label_input_name_new_file= Label(Window_new_file, text = "Name (*.tgp): ", font = ("Arial", 12))
         Label_input_name_new_file.grid(row = 1, column = 0, sticky = W)
         Entry_input_name_new_file = ttk.Entry(Window_new_file, width = 20, font = ("Arial", 12))
         Entry_input_name_new_file.grid(row = 1, column = 1, sticky = W)
 
-        Label_input_name_new_file= Label(Window_new_file, text = "Mode: ", font = ("Arial", 12))
-        Label_input_name_new_file.grid(row = 2, column = 0, sticky = W)
+        Label_input_mode_new_file= Label(Window_new_file, text = "Mode: ", font = ("Arial", 12))
+        Label_input_mode_new_file.grid(row = 2, column = 0, sticky = W)
         ComboBox_mode_new_file = ttk.Combobox(Window_new_file, width = 20, values = ["normal", "database"],  font = ("Arial", 12))
         ComboBox_mode_new_file.grid(row = 2, column = 1, sticky = W)
 
+        Label_input_call_new_file= Label(Window_new_file, text = "Call: ", font = ("Arial", 12))
+        Label_input_call_new_file.grid(row = 3, column = 0, sticky = W)
+        ComboBox_call_new_file = ttk.Combobox(Window_new_file, width = 20, values = ["plot_main", "dot_main"],  font = ("Arial", 12))
+        ComboBox_call_new_file.grid(row = 3, column = 1, sticky = W)
+
         Button_ok_new_file = ttk.Button(Window_new_file, text = "Ok", command = save)
-        Button_ok_new_file.grid(row = 3, column = 0, sticky = W)
+        Button_ok_new_file.grid(row = 4, column = 0, sticky = W)
     def convert_to_sound():
         def path_chosse():
             Entry_input_path_sound.delete(0, END)
@@ -168,6 +192,7 @@ class Command:
                 except IndexError as e:
                     msb.showerror(f"Error at write file: \n{e}\nYour simple rate is False")
                     return None
+            Window_convert_sound.destroy()
             
         Window_convert_sound = Toplevel(Window_main)
         Window_convert_sound.geometry("400x200")
@@ -180,7 +205,7 @@ class Command:
         Button_input_path_sound = ttk.Button(Window_convert_sound, text = "Path", command = path_chosse)
         Button_input_path_sound.grid(row = 0, column = 2, sticky = W)
 
-        Label_input_name_sound = Label(Window_convert_sound, text = "Name(.wav): ", font = ("Arial", 12))
+        Label_input_name_sound = Label(Window_convert_sound, text = "Name (*.wav)", font = ("Arial", 12))
         Label_input_name_sound.grid(row = 1, column = 0, sticky = W)
         Entry_input_name_sound = ttk.Entry(Window_convert_sound, width = 20, font = ("Arial", 12))
         Entry_input_name_sound.grid(row = 1, column = 1, sticky = W)
