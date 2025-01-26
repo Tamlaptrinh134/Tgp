@@ -141,7 +141,7 @@ class Command:
                 add_commands(
                     [
                         ["mode", mode],
-                        ["call", call]
+                        ["call", call],
                         ["data", str(list(Y_LINE)) if call == "plot_line" else str([list(X_DOT), list(Y_DOT)])]
                     ]
                 )
@@ -440,7 +440,27 @@ class Move:
     def off(event):
         global move
         move = False
-        display.get_tk_widget().config(cursor = "arrow")       
+        display.get_tk_widget().config(cursor = "arrow") 
+class Draw:
+    def hold():
+        while draw:
+            x, y = ax.transData.inverted().transform([
+                display.get_tk_widget().winfo_pointerx(),
+                display.get_tk_widget().winfo_pointery()
+            ])
+            X_DOT.append(x)
+            Y_DOT.append(y)
+            dot_main.set_offsets(numpy.c_[X_DOT, Y_DOT])
+            display.draw()
+    def on(event):
+        global draw 
+        draw = True
+        display.get_tk_widget().config(cursor = "tcross")
+        threading.Thread(target = Draw.hold, daemon = True).start()
+    def off(event):
+        global draw
+        draw = False
+        display.get_tk_widget().config(cursor = "arrow") 
 class Variable:
     def replace_in(event):
         item = TreeView_variable.selection()
@@ -1013,6 +1033,7 @@ point = [0, 0]
 size = [Data.width, Data.height]
 zoom = 1.1
 move = False
+draw = False
 figure = Figure([10, 10], 100)
 ax = figure.add_subplot(1, 1, 1)
 ax.grid(True, which = 'both')
@@ -1057,6 +1078,8 @@ display.draw()
 display.get_tk_widget().pack(fill = BOTH, expand = True)
 display.get_tk_widget().bind("<ButtonPress-1>", Move.on)
 display.get_tk_widget().bind("<ButtonRelease-1>", Move.off)
+display.get_tk_widget().bind("<ButtonPress-2>",Draw.on)
+display.get_tk_widget().bind("<ButtonRelease-2>", Draw.off)
 display.get_tk_widget().bind("<MouseWheel>", Zoom.zooms)
 #display.bind()
 
