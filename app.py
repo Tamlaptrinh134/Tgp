@@ -96,10 +96,14 @@ class Command:
                     Progressbar_load.update()
                 elif mode == "database":
                     try:
-                        if call == "plot_main":
+                        if call == "line_main":
+                            line_main.set_visible(True)
+                            ComboBox_setting_line_main.set(SHOW)
                             Y_LINE = eval(value)
                             line_main.set_ydata(Y_LINE)
                         elif call == "dot_main":
+                            dot_main.set_visible(True)
+                            ComboBox_setting_dot_main.set(SHOW)
                             X_DOT, Y_DOT = eval(value)
                             dot_main.set_offsets(numpy.c_[X_DOT, Y_DOT])
                         display.draw()
@@ -171,7 +175,7 @@ class Command:
 
         Label_input_call_new_file= Label(Window_new_file, text = "Call: ", font = ("Arial", 12))
         Label_input_call_new_file.grid(row = 3, column = 0, sticky = W)
-        ComboBox_call_new_file = ttk.Combobox(Window_new_file, width = 20, values = ["plot_main", "dot_main"],  font = ("Arial", 12))
+        ComboBox_call_new_file = ttk.Combobox(Window_new_file, width = 20, values = ["line_main", "dot_main"],  font = ("Arial", 12))
         ComboBox_call_new_file.grid(row = 3, column = 1, sticky = W)
 
         Button_ok_new_file = ttk.Button(Window_new_file, text = "Ok", command = save)
@@ -247,7 +251,7 @@ class Tool:
         pass
 class Setting:
     def update():
-        global line_sprt_x, line_sprt_y, line_main
+        global line_sprt_x, line_sprt_y, line_main, zoomy, point
         global NONE_AX, SEPARATOR_AX, X_LINE, Y_LINE
         Setting.width()
         Setting.height()
@@ -260,6 +264,8 @@ class Setting:
         Setting.line_sprt_y()
         Setting.line_main()
         Setting.dot_main()
+        zoomy = 1
+        point = [0, 0]
         ax.set_xlim(-(Data.width + round(Data.width / 10)), Data.width + round(Data.width / 10))
         ax.set_ylim(-(Data.height + round(Data.height / 10)), Data.height + round(Data.height / 10))
         Data.zoom = 1
@@ -386,27 +392,34 @@ class Setting:
             dot_main.set_visible(False)
 class Zoom:
     def zooms(event):
+        global zoomy
         if event.delta > 0: 
             size[0] /= zoom
             size[1] /= zoom
+            zoomy = size[1] / lsizey
             ax.set_xlim(-size[0] + point[0], size[0] + point[0])
             ax.set_ylim(-size[1] + point[1], size[1] + point[1])
             display.draw()
         else:
             size[0] *= zoom
             size[1] *= zoom
+            zoomy = size[1] / lsizey
             ax.set_xlim(-size[0] + point[0], size[0] + point[0])
             ax.set_ylim(-size[1] + point[1], size[1] + point[1])
             display.draw()
     def zoom(event = ""):
+        global zoomy
         size[0] /= zoom
         size[1] /= zoom
+        zoomy = size[1] / lsizey
         ax.set_xlim(-size[0] + point[0], size[0] + point[0])
         ax.set_ylim(-size[1] + point[1], size[1] + point[1])
         display.draw()        
     def unzoom(event = ""):
+        global zoomy
         size[0] *= zoom
         size[1] *= zoom
+        zoomy = size[1] / lsizey
         ax.set_xlim(-size[0] + point[0], size[0] + point[0])
         ax.set_ylim(-size[1] + point[1], size[1] + point[1])
         display.draw()
@@ -443,15 +456,45 @@ class Move:
         display.get_tk_widget().config(cursor = "arrow") 
 class Draw:
     def hold():
+        global X_DOT, Y_DOT
         while draw:
             x, y = ax.transData.inverted().transform([
-                display.get_tk_widget().winfo_pointerx(),
-                display.get_tk_widget().winfo_pointery()
+                display.get_tk_widget().winfo_pointerx() - display.get_tk_widget().winfo_rootx(),
+                display.get_tk_widget().winfo_pointery() - display.get_tk_widget().winfo_rootx()
             ])
             X_DOT.append(x)
-            Y_DOT.append(y)
-            dot_main.set_offsets(numpy.c_[X_DOT, Y_DOT])
+            Y_DOT.append(-y + 22*zoomy)
+            print(x, -y, zoomy)
+            dot_main.set_offsets(numpy.c_[X_DOT, Y_DOT]) 
             display.draw()
+    def undo(event = ""):
+        global undox, undoy
+        global X_DOT, Y_DOT
+        print("work")
+        if len(X_DOT) > 0 and len(Y_DOT) > 0:
+            if len(undox) < 1000 and len(undoy) < 1000:
+                undox.append(X_DOT[-1])
+                undoy.append(Y_DOT[-1])
+            X_DOT.pop()
+            Y_DOT.pop()
+            dot_main.set_offsets(numpy.c_[X_DOT, Y_DOT]) 
+            display.draw()
+    def redo(event = ""):
+        global undox, undoy
+        global X_DOT, Y_DOT
+        if len(undox) > 0 and len(undoy) > 0:
+            X_DOT.append(undox[-1])
+            Y_DOT.append(undoy[-1])
+            undox.pop()
+            undoy.pop()
+            dot_main.set_offsets(numpy.c_[X_DOT, Y_DOT]) 
+            display.draw()
+    def clear(event = ""):
+        global X_DOT, Y_DOT
+        X_DOT = []
+        Y_DOT = []
+        dot_main.set_offsets(numpy.c_[X_DOT, Y_DOT]) 
+        display.draw()
     def on(event):
         global draw 
         draw = True
@@ -582,11 +625,15 @@ def tips(event):
 class Calculator:
     def run(self, mode, view = True):
         if mode == "y = ":
+            line_main.set_visible(True)
+            ComboBox_setting_line_main.set(SHOW)
             if view:
                 return self.cal1()
             else:
                 return self.cal1nv()
         elif mode == FINDHIDDEN:
+            line_main.set_visible(True)
+            ComboBox_setting_dot_main.set(SHOW)
             if view:
                 return self.cal2()
             else:
@@ -1030,7 +1077,11 @@ Frame_main = Frame(Window_main)
 
 loop = None
 point = [0, 0]
+zoomy = 1
+undox = []
+undoy = []
 size = [Data.width, Data.height]
+lsizey = size[1]
 zoom = 1.1
 move = False
 draw = False
@@ -1080,6 +1131,9 @@ display.get_tk_widget().bind("<ButtonPress-1>", Move.on)
 display.get_tk_widget().bind("<ButtonRelease-1>", Move.off)
 display.get_tk_widget().bind("<ButtonPress-2>",Draw.on)
 display.get_tk_widget().bind("<ButtonRelease-2>", Draw.off)
+Window_main.bind("<Control-Key-z>", Draw.undo)
+Window_main.bind("<Control-Key-y>", Draw.redo)
+Window_main.bind("<Shift-Key-d>", Draw.clear)
 display.get_tk_widget().bind("<MouseWheel>", Zoom.zooms)
 #display.bind()
 
