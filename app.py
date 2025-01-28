@@ -460,11 +460,12 @@ class Draw:
         while draw:
             x, y = ax.transData.inverted().transform([
                 display.get_tk_widget().winfo_pointerx() - display.get_tk_widget().winfo_rootx(),
-                display.get_tk_widget().winfo_pointery() - display.get_tk_widget().winfo_rootx()
+                display.get_tk_widget().winfo_pointery() - display.get_tk_widget().winfo_rooty()
             ])
+            print(display.get_tk_widget().winfo_rootx(), display.get_tk_widget().winfo_rooty())
             X_DOT.append(x)
-            Y_DOT.append(-y + 22*zoomy)
-            print(x, -y, zoomy)
+            Y_DOT.append(-y + 2 * zoomy + 2 * point[1])
+            print(X_DOT[-1], Y_DOT[-1], zoomy)
             dot_main.set_offsets(numpy.c_[X_DOT, Y_DOT]) 
             display.draw()
     def undo(event = ""):
@@ -1129,11 +1130,11 @@ display.draw()
 display.get_tk_widget().pack(fill = BOTH, expand = True)
 display.get_tk_widget().bind("<ButtonPress-1>", Move.on)
 display.get_tk_widget().bind("<ButtonRelease-1>", Move.off)
-display.get_tk_widget().bind("<ButtonPress-2>",Draw.on)
-display.get_tk_widget().bind("<ButtonRelease-2>", Draw.off)
+display.get_tk_widget().bind("<ButtonPress-3>",Draw.on)
+display.get_tk_widget().bind("<ButtonRelease-3>", Draw.off)
 Window_main.bind("<Control-Key-z>", Draw.undo)
 Window_main.bind("<Control-Key-y>", Draw.redo)
-Window_main.bind("<Shift-Key-d>", Draw.clear)
+Window_main.bind("<Control-Key-d>", Draw.clear)
 display.get_tk_widget().bind("<MouseWheel>", Zoom.zooms)
 #display.bind()
 
