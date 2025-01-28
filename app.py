@@ -25,6 +25,7 @@ libs = [
     "threading", "time", "copy", "librosa", "sd", "sf","requests",
     "copy","Data"
 ]
+default_path = False
 DONE = "Done: "
 SHOW = "Show"
 HIDDEN = "Hidden"
@@ -50,10 +51,12 @@ class Data:
 
 class Command:
     def load_tgp():
-        global variables, Y_LINE
+        global variables, Y_LINE, default_path
         path = fdl.askopenfilename(filetypes = [["Tgp file", "*.tgp"]])
         with open(path, "r", encoding = "utf-8") as f:
             data = f.read()
+        Menu_top_file.entryconfig(2, state = NORMAL)
+        default_path = path
         data = data.replace("\n", "")
         dataline = data.split(";")
         ldataline = len(dataline)
@@ -127,11 +130,14 @@ class Command:
                 datafile += command+ "# " + value + ";\n"
             datafile += commands[-1][0] + "# " + commands[-1][1]
         def save():
-            ax.set_title(f"Normal mode (name: {Entry_input_name_new_file.get()})")
+            global default_path
             path = Entry_input_path_new_file.get()
             name = Entry_input_name_new_file.get()
             mode = ComboBox_mode_new_file.get()
             call = ComboBox_call_new_file.get()
+            ax.set_title(f"File (name: {name})")
+            Menu_top_file.entryconfig(2, state = NORMAL)
+            default_path = os.path.join(path, name)
             if mode == "normal":
                 add_commands(
                     [
@@ -180,6 +186,13 @@ class Command:
 
         Button_ok_new_file = ttk.Button(Window_new_file, text = "Ok", command = save)
         Button_ok_new_file.grid(row = 4, column = 0, sticky = W)
+    def save_tgp():
+        global default_path
+        if default_path:
+            with open(default_path, "w", encoding = "utf-8") as f:
+                f.write(datafile)
+        else:
+            msb.showerror(title = "Error", message = "You have not opened or created any files yet")
     def convert_to_sound():
         def path_chosse():
             Entry_input_path_sound.delete(0, END)
@@ -836,11 +849,11 @@ Menu_top_file = Menu(Menu_top, tearoff = 0)
 Menu_top_file.add_command(label = "New graph", command = Command.new_tgp)
 Menu_top_file.add_separator()
 Menu_top_file.add_command(label = "Load graph", command = Command.load_tgp)
-Menu_top_file.add_command(label = "Load variable")
+Menu_top_file.add_command(label = "Load variable", state = DISABLED)
 Menu_top_file.add_separator()
-Menu_top_file.add_command(label = "Save graph")
-Menu_top_file.add_command(label = "Save graph with invide mode")
-Menu_top_file.add_command(label = "Save variable")
+Menu_top_file.add_command(label = "Save graph", state = DISABLED if default_path else NORMAL)
+Menu_top_file.add_command(label = "Save graph with invide mode", state = DISABLED)
+Menu_top_file.add_command(label = "Save variable", state = DISABLED)
 
 Menu_top.add_cascade(menu = Menu_top_file, label = "File")
 
@@ -1074,7 +1087,6 @@ Button_unzoom.pack(side = LEFT, padx = 1)
 Frame_in.pack(fill = X, side = BOTTOM)
 
 Frame_main = Frame(Window_main)
-
 
 loop = None
 point = [0, 0]
