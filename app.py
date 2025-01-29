@@ -767,20 +767,24 @@ def tips(event):
             post_menu()
 class Calculator:
     def run(self, mode, view = True):
-        if mode == "y = ":
-            line_main.set_visible(True)
-            ComboBox_setting_line_main.set(SHOW)
-            if view:
-                return self.cal1()
-            else:
-                return self.cal1nv()
-        elif mode == FINDHIDDEN:
-            line_main.set_visible(True)
-            ComboBox_setting_dot_main.set(SHOW)
-            if view:
-                return self.cal2()
-            else:
-                return self.cal2nv()
+        global run
+        def core(self, mode):
+            if mode == "y = ":
+                line_main.set_visible(True)
+                ComboBox_setting_line_main.set(SHOW)
+                if view:
+                    return self.cal1()
+                else:
+                    return self.cal1nv()
+            elif mode == FINDHIDDEN:
+                line_main.set_visible(True)
+                ComboBox_setting_dot_main.set(SHOW)
+                if view:
+                    return self.cal2()
+                else:
+                    return self.cal2nv()
+        run = threading.Thread(target = core, args = (self, mode,), daemon = True)
+        run.start()
     def cal1(self, event = ""):
         global loop
         global X_LINE
@@ -950,7 +954,7 @@ class Calculator:
         Button_run.config(state = DISABLED)
         Entry_command.config(state = DISABLED)
     def loop_stop(self):
-        global loop
+        global loop, run
         loop = False
         Button_loop.config(state = NORMAL)
         Button_run.config(state = NORMAL)
@@ -1219,6 +1223,7 @@ Frame_in.pack(fill = X, side = BOTTOM)
 Frame_main = Frame(Window_main)
 
 loop = None
+run = False
 point = [0, 0]
 zoomy = 1
 undox = []
