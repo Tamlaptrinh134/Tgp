@@ -10,6 +10,7 @@
         "Labelframe_graph": "Biểu đồ",
         "Labelframe_window": "Cửa sổ",
         "Labelframe_plot": "Đồ thị",
+        "Labelframe_plot_elements": "Các phần tử đồ thị",
         "Labelframe_variable_add": "Thêm biến",
         "Labelframe_variable_control": "Điều khiển biến",  
         "Label_setting_width": "Chiều rộng: ",
@@ -25,6 +26,10 @@
         "Button_variable_add": "Thêm",
         "ComboBox_setting_progressbar": ["Hiển Thị", "Ẩn"],
         "ComboBox_setting_state": ["Hiển Thị", "Ẩn"],
+        "ComboBox_setting_line_sprt_x": ["Hiển Thị", "Ẩn"],
+        "ComboBox_setting_line_sprt_y": ["Hiển Thị", "Ẩn"],
+        "ComboBox_setting_line_main": ["Hiển Thị", "Ẩn"],
+        "ComboBox_setting_dot_main": ["Hiển Thị", "Ẩn"],
         "ComboBox_mode": ["y = ", "Tìm ẩn"],
         "Tab_tools": ["Bảng điều khiển", "Cài đặt", "Biến"],
         "Menu_top": {
@@ -34,8 +39,9 @@
                 "2": "Tải đồ thị",
                 "3": "Tải biến",
                 "5": "Lưu đồ thị",
-                "6": "Lưu đồ thị (chế độ invide)",
-                "7": "Lưu biến"
+                "6": "Lưu đồ thị dưới dạng",
+                "7": "Lưu đồ thị (chế độ invide)",
+                "8": "Lưu biến"
             },
             "2": "Công cụ",
             "Menu_top_tool": {
@@ -55,6 +61,7 @@
         "Labelframe_graph": "Graph",
         "Labelframe_window": "Window",
         "Labelframe_plot": "Plot",
+        "Labelframe_plot_elements": "Plot elements",
         "Labelframe_variable_add": "Add variable",
         "Labelframe_variable_control": "Variable control",  
         "Label_setting_width": "Width: ",
@@ -70,6 +77,10 @@
         "Button_variable_add": "Add",
         "ComboBox_setting_progressbar": ["Show", "Hidden"],
         "ComboBox_setting_state": ["Show", "Hidden"],
+        "ComboBox_setting_line_sprt_x": ["Show", "Hidden"],
+        "ComboBox_setting_line_sprt_y": ["Show", "Hidden"],
+        "ComboBox_setting_line_main": ["Show", "Hidden"],
+        "ComboBox_setting_dot_main": ["Show", "Hidden"],
         "ComboBox_mode": ["y = ", "Find hidden"],
         "Tab_tools": ["Dashboard", "Settings", "Variables"],
         "Menu_top": {
@@ -79,8 +90,9 @@
                 "2": "Load graph",
                 "3": "Load variable",
                 "5": "Save graph",
-                "6": "Save graph (invide mode)",
-                "7": "Save variable"
+                "6": "Save graph as",
+                "7": "Save graph (invide mode)",
+                "8": "Save variable"
             },
             "2": "Tools",
             "Menu_top_tool": {

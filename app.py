@@ -56,10 +56,12 @@ class Command:
         def core():
             global variables, Y_LINE
             global default_path, default_mode, default_call
+            global X_DOT, Y_DOT
             path = fdl.askopenfilename(filetypes = [["Tgp file", "*.tgp"]])
             with open(path, "r", encoding = "utf-8") as f:
                 data = f.read()
             Menu_top_file.entryconfig(5, state = NORMAL)
+            Menu_top_file.entryconfig(6, state = NORMAL)
             default_path = path
             data = data.replace("\n", "")
             dataline = data.split(";")
@@ -152,6 +154,7 @@ class Command:
             call = ComboBox_call_new_file.get()
             ax.set_title(f"File (name: {name})")
             Menu_top_file.entryconfig(5, state = NORMAL)
+            Menu_top_file.entryconfig(6, state = NORMAL)
             default_path = os.path.join(path, name)
             default_mode = mode
             default_call = call
@@ -169,7 +172,7 @@ class Command:
                     [
                         ["mode", mode],
                         ["call", call],
-                        ["data", str(list(Y_LINE)) if call == "plot_line" else str([list(X_DOT), list(Y_DOT)])]
+                        ["data", str(list(Y_LINE)) if call == "line_main" else str([list(X_DOT), list(Y_DOT)])]
                     ]
                 )
             with open(f"{os.path.join(path, name)}.tgp", "w", encoding = "utf-8") as f:
@@ -177,6 +180,7 @@ class Command:
             Window_new_file.destroy()
         datafile = ""
         Window_new_file = Toplevel(Window_main)
+        Window_new_file.title("New file")
         Window_new_file.geometry("600x400")
 
         Label_input_path_new_file = Label(Window_new_file, text = "Path: ", font = ("Arial", 12))
@@ -230,7 +234,7 @@ class Command:
                     [
                         ["mode", default_mode],
                         ["call", default_call],
-                        ["data", str(list(Y_LINE)) if default_call == "plot_line" else str([list(X_DOT), list(Y_DOT)])]
+                        ["data", str(list(Y_LINE)) if default_call == "line_main" else str([list(X_DOT), list(Y_DOT)])]
                     ]
                 )
             with open(default_path, "w", encoding = "utf-8") as f:
@@ -281,7 +285,8 @@ class Command:
                 f.write(datafile)
             Window_save_as.destroy()
         datafile = ""
-        Window_save_as = Toplevel(Window_main, title = "Save as")
+        Window_save_as = Toplevel(Window_main)
+        Window_save_as.title("Save as")
         Window_save_as.geometry("600x400")
 
         Label_input_path_save_as = Label(Window_save_as, text = "Path: ", font = ("Arial", 12))
@@ -348,6 +353,8 @@ class Command:
 
         Button_save_to_sound = ttk.Button(Window_convert_sound, text = "Save", command = save)
         Button_save_to_sound.grid(row = 3, column = 0, sticky = W)
+    def help():
+        pass
     def event():
         threading.Thread(target = os.system, args=("2025.mp4",)).start()
 
@@ -458,7 +465,7 @@ class Setting:
         Labelframe_error.config(text = language["Labelframe_error"])
         Labelframe_graph.config(text = language["Labelframe_graph"])
         Labelframe_window.config(text = language["Labelframe_window"])
-        #Labelframe_plot_elements.config(text = language["Labelframe_plot_elements"])
+        Labelframe_plot_elements.config(text = language["Labelframe_plot_elements"])
         Labelframe_variable_add.config(text = language["Labelframe_variable_add"])
         Labelframe_variable_control.config(text = language["Labelframe_variable_control"])
 
@@ -480,6 +487,14 @@ class Setting:
         ComboBox_setting_state.config(values = language["ComboBox_setting_state"])
         ComboBox_setting_state.current(languagel["ComboBox_setting_state"].index(ComboBox_setting_state.get()))
         ComboBox_mode.config(values = language["ComboBox_mode"])
+        ComboBox_setting_line_sprt_x.config(values = language["ComboBox_setting_line_sprt_x"])
+        ComboBox_setting_line_sprt_x.current(languagel["ComboBox_setting_line_sprt_x"].index(ComboBox_setting_line_sprt_x.get()))
+        ComboBox_setting_line_sprt_y.config(values = language["ComboBox_setting_line_sprt_y"])
+        ComboBox_setting_line_sprt_y.current(languagel["ComboBox_setting_line_sprt_y"].index(ComboBox_setting_line_sprt_y.get()))
+        ComboBox_setting_line_main.config(values = language["ComboBox_setting_line_main"])
+        ComboBox_setting_line_main.current(languagel["ComboBox_setting_line_main"].index(ComboBox_setting_line_main.get()))
+        ComboBox_setting_dot_main.config(values = language["ComboBox_setting_dot_main"])
+        ComboBox_setting_dot_main.current(languagel["ComboBox_setting_dot_main"].index(ComboBox_setting_dot_main.get()))
 
         Tab_tools.tab(0, text = language["Tab_tools"][0])
         Tab_tools.tab(1, text = language["Tab_tools"][1])
@@ -966,7 +981,7 @@ Menu_top_file.add_command(label = "Load graph", command = Command.load_tgp)
 Menu_top_file.add_command(label = "Load variable", state = DISABLED)
 Menu_top_file.add_separator()
 Menu_top_file.add_command(label = "Save graph", state = NORMAL if default_path else DISABLED, command = Command.save_tgp)
-Menu_top_file.add_command(label = "Save graph as", state = NORMAL if default_path else DISABLED, command = Command.save_tgp_as)
+Menu_top_file.add_command(label = "Save graph as", state = NORMAL if default_path else DISABLED, command = Command.save_as_tgp)
 Menu_top_file.add_command(label = "Save graph with invide mode", state = DISABLED)
 Menu_top_file.add_command(label = "Save variable", state = DISABLED)
 
