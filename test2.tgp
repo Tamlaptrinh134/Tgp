@@ -1,0 +1,4 @@
+mode# normal;
+call# findhidden;
+variable# [['$x', -100.0], ['$y', -100.0]];
+data# abs($x)

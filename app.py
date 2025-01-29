@@ -26,6 +26,8 @@ libs = [
     "copy","Data"
 ]
 default_path = False
+default_mode = False
+default_call = False
 DONE = "Done: "
 SHOW = "Show"
 HIDDEN = "Hidden"
@@ -51,76 +53,89 @@ class Data:
 
 class Command:
     def load_tgp():
-        global variables, Y_LINE, default_path
-        path = fdl.askopenfilename(filetypes = [["Tgp file", "*.tgp"]])
-        with open(path, "r", encoding = "utf-8") as f:
-            data = f.read()
-        Menu_top_file.entryconfig(2, state = NORMAL)
-        default_path = path
-        data = data.replace("\n", "")
-        dataline = data.split(";")
-        ldataline = len(dataline)
-        mode = ""
-        call = ""
-        Label_title_state.config(text = "Load file")
-        for index,item in enumerate(dataline):
-            command = item.split("# ")[0]
-            value = item.split("# ")[1]
-            if command == "mode":
-                mode = value
-            elif command == "call":
-                call = value
-            elif command == "variable":
-                variables = [variables[0]]
-                try:
-                    valuev = eval(value)
-                    for i in valuev:
-                        variables.append(i)
-                    Variable.update()
-                except Exception as e:
-                    Label_title_state.config(text = "Error")
-                    Label_state.config(text = "")
-                    var_progressbar_load.set(0)
-                    Progressbar_load.update()
-                    msb.showerror(title = "Error at read file: ", message = f"{e}\nVariable in this file has error")
-                    return None
-            elif command == "data":
-                if mode == "normal":
-                    Entry_command.delete(0, END)
-                    Entry_command.insert(0, value)
-                    if call == "y=":
-                        ComboBox_mode.current(0)
-                    elif call == "findhidden":
-                        ComboBox_mode.current(1)
-                    calculator.run(ComboBox_mode.get(), view = False)
-                    Label_title_state.config(text = "Done")
-                    Label_state.config(text = "")
-                    var_progressbar_load.set(0)
-                    Progressbar_load.update()
-                elif mode == "database":
+        def core():
+            global variables, Y_LINE
+            global default_path, default_mode, default_call
+            path = fdl.askopenfilename(filetypes = [["Tgp file", "*.tgp"]])
+            with open(path, "r", encoding = "utf-8") as f:
+                data = f.read()
+            Menu_top_file.entryconfig(5, state = NORMAL)
+            default_path = path
+            data = data.replace("\n", "")
+            dataline = data.split(";")
+            ldataline = len(dataline)
+            mode = ""
+            call = ""
+            Label_title_state.config(text = "Load file")
+            for index,item in enumerate(dataline):
+                command = item.split("# ")[0]
+                value = item.split("# ")[1]
+                if command == "mode":
+                    mode = value
+                    default_mode = mode
+                elif command == "call":
+                    call = value
+                    default_call = call
+                elif command == "variable":
+                    variables = [variables[0]]
                     try:
-                        if call == "line_main":
-                            line_main.set_visible(True)
-                            ComboBox_setting_line_main.set(SHOW)
-                            Y_LINE = eval(value)
-                            line_main.set_ydata(Y_LINE)
-                        elif call == "dot_main":
-                            dot_main.set_visible(True)
-                            ComboBox_setting_dot_main.set(SHOW)
-                            X_DOT, Y_DOT = eval(value)
-                            dot_main.set_offsets(numpy.c_[X_DOT, Y_DOT])
-                        display.draw()
+                        valuev = eval(value)
+                        for i in valuev:
+                            variables.append(i)
+                        Variable.update()
                     except Exception as e:
                         Label_title_state.config(text = "Error")
                         Label_state.config(text = "")
                         var_progressbar_load.set(0)
                         Progressbar_load.update()
-                        msb.showerror(title= f"Error at read file:", message = f"{e}\nData in this file has error")
+                        msb.showerror(title = "Error at read file: ", message = f"{e}\nVariable in this file has error")
                         return None
-            Progressbar_load.step(100 / ldataline)
-            Progressbar_load.update()
-            Label_state.config(text = f"{(index+1)/ ldataline * 100}%")
+                elif command == "data":
+                    if mode == "normal":
+                        Entry_command.delete(0, END)
+                        Entry_command.insert(0, value)
+                        if call == "y=":
+                            ComboBox_mode.current(0)
+                        elif call == "findhidden":
+                            ComboBox_mode.current(1)
+                        calculator.run(ComboBox_mode.get(), view = False)
+                        Label_title_state.config(text = "Done")
+                        Label_state.config(text = "")
+                        var_progressbar_load.set(0)
+                        Progressbar_load.update()
+                    elif mode == "database":
+                        try:
+                            if call == "line_main":
+                                line_main.set_visible(True)
+                                ComboBox_setting_line_main.set(SHOW)
+                                Y_LINE = eval(value)
+                                line_main.set_ydata(Y_LINE)
+                            elif call == "dot_main":
+                                dot_main.set_visible(True)
+                                ComboBox_setting_dot_main.set(SHOW)
+                                X_DOT, Y_DOT = eval(value)
+                                dot_main.set_offsets(numpy.c_[X_DOT, Y_DOT])
+                            display.draw()
+                        except Exception as e:
+                            Label_title_state.config(text = "Error")
+                            Label_state.config(text = "")
+                            var_progressbar_load.set(0)
+                            Progressbar_load.update()
+                            msb.showerror(title= f"Error at read file:", message = f"{e}\nData in this file has error")
+                            return None
+                Progressbar_load.step(100 / ldataline)
+                Progressbar_load.update()
+                Label_state.config(text = f"{(index+1)/ ldataline * 100}%")
+                var_progressbar_load.set(0)
+        threading.Thread(target = core, daemon = True).start()
     def new_tgp():
+        def combobox_mode_new_file_select(event = ""):
+            if ComboBox_mode_new_file.get() == "normal":
+                ComboBox_call_new_file.config(values = ["y=", "findhidden"])
+                ComboBox_call_new_file.current(0)
+            elif ComboBox_mode_new_file.get() == "database":
+                ComboBox_call_new_file.config(values = ["line_main", "dot_main"])
+                ComboBox_call_new_file.current(0)
         def path_chosse():
             Entry_input_path_new_file.delete(0, END)
             Entry_input_path_new_file.insert(0, fdl.askdirectory())
@@ -130,19 +145,21 @@ class Command:
                 datafile += command+ "# " + value + ";\n"
             datafile += commands[-1][0] + "# " + commands[-1][1]
         def save():
-            global default_path
+            global default_path, default_mode, default_call
             path = Entry_input_path_new_file.get()
             name = Entry_input_name_new_file.get()
             mode = ComboBox_mode_new_file.get()
             call = ComboBox_call_new_file.get()
             ax.set_title(f"File (name: {name})")
-            Menu_top_file.entryconfig(2, state = NORMAL)
+            Menu_top_file.entryconfig(5, state = NORMAL)
             default_path = os.path.join(path, name)
+            default_mode = mode
+            default_call = call
             if mode == "normal":
                 add_commands(
                     [
                         ["mode", mode],
-                        ["call", "y=" if ComboBox_mode.get() == "y = " else "findhidden"],
+                        ["call", call],
                         ["variable", str(variables)],
                         ["data", Entry_command.get()]
                     ]
@@ -176,23 +193,120 @@ class Command:
 
         Label_input_mode_new_file= Label(Window_new_file, text = "Mode: ", font = ("Arial", 12))
         Label_input_mode_new_file.grid(row = 2, column = 0, sticky = W)
-        ComboBox_mode_new_file = ttk.Combobox(Window_new_file, width = 20, values = ["normal", "database"],  font = ("Arial", 12))
+        ComboBox_mode_new_file = ttk.Combobox(Window_new_file, width = 20, values = ["normal", "database"],  font = ("Arial", 12), state = "readonly")
+        ComboBox_mode_new_file.current(0)
         ComboBox_mode_new_file.grid(row = 2, column = 1, sticky = W)
+        ComboBox_mode_new_file.bind("<<ComboboxSelected>>", combobox_mode_new_file_select)
 
         Label_input_call_new_file= Label(Window_new_file, text = "Call: ", font = ("Arial", 12))
         Label_input_call_new_file.grid(row = 3, column = 0, sticky = W)
-        ComboBox_call_new_file = ttk.Combobox(Window_new_file, width = 20, values = ["line_main", "dot_main"],  font = ("Arial", 12))
+        ComboBox_call_new_file = ttk.Combobox(Window_new_file, width = 20, values = ["line_main", "dot_main"],  font = ("Arial", 12), state = "readonly")
+        ComboBox_call_new_file.current(0)
         ComboBox_call_new_file.grid(row = 3, column = 1, sticky = W)
+        combobox_mode_new_file_select("")
 
         Button_ok_new_file = ttk.Button(Window_new_file, text = "Ok", command = save)
         Button_ok_new_file.grid(row = 4, column = 0, sticky = W)
     def save_tgp():
-        global default_path
+        def add_commands(commands: list):
+            nonlocal datafile
+            for command, value in commands[0:-1]:
+                datafile += command+ "# " + value + ";\n"
+            datafile += commands[-1][0] + "# " + commands[-1][1]
+        global default_path, default_mode, default_call
+        datafile = ""
         if default_path:
+            if default_mode == "normal":
+                add_commands(
+                    [
+                        ["mode", default_mode],
+                        ["call", default_call],
+                        ["variable", str(variables)],
+                        ["data", Entry_command.get()]
+                    ]
+                )
+            elif default_mode == "database":
+                add_commands(
+                    [
+                        ["mode", default_mode],
+                        ["call", default_call],
+                        ["data", str(list(Y_LINE)) if default_call == "plot_line" else str([list(X_DOT), list(Y_DOT)])]
+                    ]
+                )
             with open(default_path, "w", encoding = "utf-8") as f:
                 f.write(datafile)
-        else:
-            msb.showerror(title = "Error", message = "You have not opened or created any files yet")
+    def save_as_tgp():
+        def combobox_mode_save_as_select(event = ""):
+            if ComboBox_mode_save_as.get() == "normal":
+                ComboBox_call_save_as.config(values = ["y=", "findhidden"])
+                ComboBox_call_save_as.current(0)
+            elif ComboBox_mode_save_as.get() == "database":
+                ComboBox_call_save_as.config(values = ["line_main", "dot_main"])
+                ComboBox_call_save_as.current(0)
+        def path_chosse():
+            Entry_input_path_save_as.delete(0, END)
+            Entry_input_path_save_as.insert(0, fdl.asksaveasfilename(filetypes = [["Tgp file", "*.tgp"]]))
+        def add_commands(commands: list):
+            nonlocal datafile
+            for command, value in commands[0:-1]:
+                datafile += command+ "# " + value + ";\n"
+            datafile += commands[-1][0] + "# " + commands[-1][1]
+        def save():
+            global default_path, default_mode, default_call
+            path = Entry_input_path_save_as.get()
+            mode = ComboBox_mode_save_as.get()
+            call = ComboBox_call_save_as.get()
+            Menu_top_file.entryconfig(5, state = NORMAL)
+            default_path = path
+            default_mode = mode
+            default_call = call
+            if mode == "normal":
+                add_commands(
+                    [
+                        ["mode", mode],
+                        ["call", call],
+                        ["variable", str(variables)],
+                        ["data", Entry_command.get()]
+                    ]
+                )
+            elif mode == "database":
+                add_commands(
+                    [
+                        ["mode", mode],
+                        ["call", call],
+                        ["data", str(list(Y_LINE)) if call == "plot_line" else str([list(X_DOT), list(Y_DOT)])]
+                    ]
+                )
+            with open(path, "w", encoding = "utf-8") as f:
+                f.write(datafile)
+            Window_save_as.destroy()
+        datafile = ""
+        Window_save_as = Toplevel(Window_main, title = "Save as")
+        Window_save_as.geometry("600x400")
+
+        Label_input_path_save_as = Label(Window_save_as, text = "Path: ", font = ("Arial", 12))
+        Label_input_path_save_as.grid(row = 0, column = 0, sticky = W)
+        Entry_input_path_save_as = ttk.Entry(Window_save_as, width = 20, font = ("Arial", 12))
+        Entry_input_path_save_as.grid(row = 0, column = 1, sticky = W)
+        Button_input_path_save_as = ttk.Button(Window_save_as, text = "Path", command = path_chosse)
+        Button_input_path_save_as.grid(row = 0, column = 2, sticky = W)
+
+        Label_input_mode_save_as= Label(Window_save_as, text = "Mode: ", font = ("Arial", 12))
+        Label_input_mode_save_as.grid(row = 2, column = 0, sticky = W)
+        ComboBox_mode_save_as = ttk.Combobox(Window_save_as, width = 20, values = ["normal", "database"],  font = ("Arial", 12), state = "readonly")
+        ComboBox_mode_save_as.current(0)
+        ComboBox_mode_save_as.grid(row = 2, column = 1, sticky = W)
+        ComboBox_mode_save_as.bind("<<ComboboxSelected>>", combobox_mode_save_as_select)
+
+        Label_input_call_save_as= Label(Window_save_as, text = "Call: ", font = ("Arial", 12))
+        Label_input_call_save_as.grid(row = 3, column = 0, sticky = W)
+        ComboBox_call_save_as = ttk.Combobox(Window_save_as, width = 20, values = ["line_main", "dot_main"],  font = ("Arial", 12), state = "readonly")
+        ComboBox_call_save_as.current(0)
+        ComboBox_call_save_as.grid(row = 3, column = 1, sticky = W)
+        combobox_mode_save_as_select("")
+
+        Button_ok_save_as = ttk.Button(Window_save_as, text = "Ok", command = save)
+        Button_ok_save_as.grid(row = 4, column = 0, sticky = W)
     def convert_to_sound():
         def path_chosse():
             Entry_input_path_sound.delete(0, END)
@@ -851,7 +965,8 @@ Menu_top_file.add_separator()
 Menu_top_file.add_command(label = "Load graph", command = Command.load_tgp)
 Menu_top_file.add_command(label = "Load variable", state = DISABLED)
 Menu_top_file.add_separator()
-Menu_top_file.add_command(label = "Save graph", state = DISABLED if default_path else NORMAL)
+Menu_top_file.add_command(label = "Save graph", state = NORMAL if default_path else DISABLED, command = Command.save_tgp)
+Menu_top_file.add_command(label = "Save graph as", state = NORMAL if default_path else DISABLED, command = Command.save_tgp_as)
 Menu_top_file.add_command(label = "Save graph with invide mode", state = DISABLED)
 Menu_top_file.add_command(label = "Save variable", state = DISABLED)
 
