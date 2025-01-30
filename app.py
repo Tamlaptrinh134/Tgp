@@ -998,7 +998,7 @@ Menu_top_tool.add_command(label = "Convert to sound(Have in 1.1 version)", comma
 
 Menu_top.add_cascade(menu = Menu_top_tool, label = "Tool")
 
-Menu_top.add_command(label = "Help")
+Menu_top.add_command(label = "Help", command = Command.help)
 
 Window_main.config(menu = Menu_top)
 
