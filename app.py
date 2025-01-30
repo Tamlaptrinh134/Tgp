@@ -355,7 +355,7 @@ class Command:
         Button_save_to_sound = ttk.Button(Window_convert_sound, text = "Save", command = save)
         Button_save_to_sound.grid(row = 3, column = 0, sticky = W)
     def help():
-        webbrowser.open(os.path.json(os.path.dirname(os.path.abspath(__file__)), "README.pdf"))
+        webbrowser.open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "README.pdf"))
     def event():
         threading.Thread(target = os.system, args=("2025.mp4",)).start()
 
