@@ -10,6 +10,7 @@ import numpy, math, random, threading, time, copy, librosa
 import sounddevice as sd
 import soundfile as sf
 import requests, copy, os, json
+import webbrowser
 #TamCN coding / DangNhanTam
 
 Window_main = ThemedTk(theme = "arc")
@@ -23,7 +24,7 @@ variables = []
 libs = [
     "fdl", "msb", "Image", "ImageTk", "numpy", "math", "random",
     "threading", "time", "copy", "librosa", "sd", "sf","requests",
-    "copy","Data"
+    "copy", "Data", "webbrowser"
 ]
 default_path = False
 default_mode = False
@@ -354,7 +355,7 @@ class Command:
         Button_save_to_sound = ttk.Button(Window_convert_sound, text = "Save", command = save)
         Button_save_to_sound.grid(row = 3, column = 0, sticky = W)
     def help():
-        pass
+        webbrowser.open(os.path.json(os.path.dirname(os.path.abspath(__file__)), "README.pdf"))
     def event():
         threading.Thread(target = os.system, args=("2025.mp4",)).start()
 
