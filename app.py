@@ -1053,17 +1053,17 @@ Labelframe_graph = ttk.Labelframe(Frame_setting, text = "Graph")
 
 Label_setting_width = Label(Labelframe_graph, text = "Width: ", font = ("Arial", 12))
 Label_setting_width.grid(row = 0, column = 0, sticky = W)
-Spinbox_setting_width = ttk.Spinbox(Labelframe_graph, from_ = -2147483647, to = 2147483647, font = ("Arial", 12))
+Spinbox_setting_width = ttk.Spinbox(Labelframe_graph, from_ = 0, to = 2147483647, font = ("Arial", 12))
 Spinbox_setting_width.grid(row = 0, column = 1, sticky = W)
 
 Label_setting_height = Label(Labelframe_graph, text =  "Height: ", font = ("Arial", 12))
 Label_setting_height.grid(row = 1, column = 0, sticky = W)
-Spinbox_setting_height = ttk.Spinbox(Labelframe_graph, from_ = -2147483647, to = 2147483647, font = ("Arial", 12))
+Spinbox_setting_height = ttk.Spinbox(Labelframe_graph, from_ = 0, to = 2147483647, font = ("Arial", 12))
 Spinbox_setting_height.grid(row = 1, column = 1, sticky = W)
 
 Label_setting_step = Label(Labelframe_graph, text = "Step: ", font = ("Arial", 12))
 Label_setting_step.grid(row = 2, column = 0, sticky = W)
-Spinbox_setting_step = ttk.Spinbox(Labelframe_graph, from_ = -2147483647, to = 2147483647, font = ("Arial", 12))
+Spinbox_setting_step = ttk.Spinbox(Labelframe_graph, from_ = 0, to = 2147483647, font = ("Arial", 12))
 Spinbox_setting_step.grid(row = 2, column = 1, sticky = W)
 
 Label_setting_hz = Label(Labelframe_graph, text = "Hz: ", font = ("Arial", 12))
