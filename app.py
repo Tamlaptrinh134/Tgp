@@ -7,6 +7,7 @@ from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from PIL import Image, ImageTk
 import numpy, math, random, threading, time, copy, librosa
+import numpy as np
 import sounddevice as sd
 import soundfile as sf
 import requests, copy, os, json
@@ -67,8 +68,10 @@ class Command:
             data = data.replace("\n", "")
             dataline = data.split(";")
             ldataline = len(dataline)
+            name = os.path.basename(path)
             mode = ""
             call = ""
+            ax.set_title(f"File (name: {name})")
             Label_title_state.config(text = "Load file")
             for index,item in enumerate(dataline):
                 command = item.split("# ")[0]
@@ -176,8 +179,11 @@ class Command:
                         ["data", str(list(Y_LINE)) if call == "line_main" else str([list(X_DOT), list(Y_DOT)])]
                     ]
                 )
-            with open(f"{os.path.join(path, name)}.tgp", "w", encoding = "utf-8") as f:
-                f.write(datafile)
+            try:
+                with open(f"{os.path.join(path, name)}.tgp", "w", encoding = "utf-8") as f:
+                    f.write(datafile)
+            except Exception as e:
+                msb.showerror(f"Error at write file: \n{e}")
             Window_new_file.destroy()
         datafile = ""
         Window_new_file = Toplevel(Window_main)
@@ -191,7 +197,7 @@ class Command:
         Button_input_path_new_file = ttk.Button(Window_new_file, text = "Path", command = path_chosse)
         Button_input_path_new_file.grid(row = 0, column = 2, sticky = W)
 
-        Label_input_name_new_file= Label(Window_new_file, text = "Name (*.tgp): ", font = ("Arial", 12))
+        Label_input_name_new_file= Label(Window_new_file, text = "Name: ", font = ("Arial", 12))
         Label_input_name_new_file.grid(row = 1, column = 0, sticky = W)
         Entry_input_name_new_file = ttk.Entry(Window_new_file, width = 20, font = ("Arial", 12))
         Entry_input_name_new_file.grid(row = 1, column = 1, sticky = W)
@@ -214,11 +220,12 @@ class Command:
         Button_ok_new_file.grid(row = 4, column = 0, sticky = W)
     def save_tgp():
         def add_commands(commands: list):
-            nonlocal datafile
+            global datafile
             for command, value in commands[0:-1]:
                 datafile += command+ "# " + value + ";\n"
             datafile += commands[-1][0] + "# " + commands[-1][1]
         global default_path, default_mode, default_call
+        global datafile
         datafile = ""
         if default_path:
             if default_mode == "normal":
@@ -279,11 +286,14 @@ class Command:
                     [
                         ["mode", mode],
                         ["call", call],
-                        ["data", str(list(Y_LINE)) if call == "plot_line" else str([list(X_DOT), list(Y_DOT)])]
+                        ["data", str(list(Y_LINE)) if call == "line_main" else str([list(X_DOT), list(Y_DOT)])]
                     ]
                 )
-            with open(path, "w", encoding = "utf-8") as f:
-                f.write(datafile)
+            try:
+                with open(path, "w", encoding = "utf-8") as f:
+                    f.write(datafile)
+            except Exception as e:
+                msb.showerror(f"Error at write file: \n{e}")
             Window_save_as.destroy()
         datafile = ""
         Window_save_as = Toplevel(Window_main)
@@ -325,7 +335,7 @@ class Command:
             sr = Spinbox_input_sr.get()
             if os.path.exists(path):
                 try:
-                    sf.write(os.path.join(path, name), Y_LINE, int(sr), subtype='PCM_24')
+                    sf.write(os.path.join(path, name) + ".wav", Y_LINE, int(sr), subtype='PCM_24')
                 except IndexError as e:
                     msb.showerror(f"Error at write file: \n{e}\nYour simple rate is False")
                     return None
@@ -342,7 +352,7 @@ class Command:
         Button_input_path_sound = ttk.Button(Window_convert_sound, text = "Path", command = path_chosse)
         Button_input_path_sound.grid(row = 0, column = 2, sticky = W)
 
-        Label_input_name_sound = Label(Window_convert_sound, text = "Name (*.wav)", font = ("Arial", 12))
+        Label_input_name_sound = Label(Window_convert_sound, text = "Name", font = ("Arial", 12))
         Label_input_name_sound.grid(row = 1, column = 0, sticky = W)
         Entry_input_name_sound = ttk.Entry(Window_convert_sound, width = 20, font = ("Arial", 12))
         Entry_input_name_sound.grid(row = 1, column = 1, sticky = W)
@@ -640,10 +650,11 @@ class Draw:
         dot_main.set_offsets(numpy.c_[X_DOT, Y_DOT]) 
         display.draw()
     def on(event):
-        global draw 
-        draw = True
-        display.get_tk_widget().config(cursor = "tcross")
-        threading.Thread(target = Draw.hold, daemon = True).start()
+        global draw
+        if ComboBox_setting_dot_main.get() == SHOW: 
+            draw = True
+            display.get_tk_widget().config(cursor = "tcross")
+            threading.Thread(target = Draw.hold, daemon = True).start()
     def off(event):
         global draw
         draw = False
@@ -994,7 +1005,7 @@ Menu_top.add_cascade(menu = Menu_top_file, label = "File")
 
 Menu_top_tool = Menu(Menu_top, tearoff = 0)
 
-Menu_top_tool.add_command(label = "Convert to sound(Have in 1.1 version)", command = Command.convert_to_sound)
+Menu_top_tool.add_command(label = "Convert to sound", command = Command.convert_to_sound)
 
 Menu_top.add_cascade(menu = Menu_top_tool, label = "Tool")
 
@@ -1234,6 +1245,7 @@ lsizey = size[1]
 zoom = 1.1
 move = False
 draw = False
+selectstatus = {"method": None}
 figure = Figure([10, 10], 100)
 ax = figure.add_subplot(1, 1, 1)
 ax.grid(True, which = 'both')
@@ -1246,7 +1258,7 @@ Y_DOT = []
 line_sprt_x,  = ax.plot(SEPARATOR_AX["X"], NONE_AX, color = "blue")
 line_sprt_y,  = ax.plot(NONE_AX, SEPARATOR_AX["Y"], color = "blue")
 line_main, = ax.plot(X_LINE, Y_LINE, color = "red")
-dot_main = ax.scatter(X_DOT, Y_DOT, color = "green")
+dot_main = ax.scatter(X_DOT, Y_DOT, color = "green", s=78.54)
 line_sprt_x_state = True
 line_sprt_y_state = True
 line_main_state = True
