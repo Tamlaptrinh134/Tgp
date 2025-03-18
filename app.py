@@ -16,6 +16,7 @@ import webbrowser
 
 Window_main = ThemedTk(theme = "arc")
 Window_main.title("Tgp Cùng với biểu đồ nào")
+Window_main.iconbitmap("BIN/icon.ico")
 Window_main.geometry("1270x700")
 
 #variable:
@@ -188,6 +189,7 @@ class Command:
         datafile = ""
         Window_new_file = Toplevel(Window_main)
         Window_new_file.title("New file")
+        Window_new_file.iconbitmap("BIN/icon.ico")
         Window_new_file.geometry("600x400")
 
         Label_input_path_new_file = Label(Window_new_file, text = "Path: ", font = ("Arial", 12))
@@ -298,6 +300,7 @@ class Command:
         datafile = ""
         Window_save_as = Toplevel(Window_main)
         Window_save_as.title("Save as")
+        Window_save_as.iconbitmap("BIN/icon.ico")
         Window_save_as.geometry("600x400")
 
         Label_input_path_save_as = Label(Window_save_as, text = "Path: ", font = ("Arial", 12))
